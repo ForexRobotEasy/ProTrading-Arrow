@@ -1,0 +1,76 @@
+mql5
+//+------------------------------------------------------------------+
+//|                    ProTrading Arrow by Forex Robot Easy Team     |
+//|                           forexroboteasy.com                      |
+//+------------------------------------------------------------------+
+
+// Define input parameters
+input int ArrowPeriod = 14; // Period for calculating trend reversals
+
+// Define global variables
+double prevClose = 0;
+double currClose = 0;
+bool buySignal = false;
+bool sellSignal = false;
+
+//+------------------------------------------------------------------+
+//|                           Expert initialization function        |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Initialize variables
+    prevClose = iClose(Symbol(), 0, 1);
+    currClose = iClose(Symbol(), 0, 0);
+    
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//|                           Expert tick function                   |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Update current and previous close prices
+    prevClose = currClose;
+    currClose = iClose(Symbol(), 0, 0);
+    
+    // Calculate trend reversal
+    double trendReversal = MathAbs(prevClose - currClose);
+    
+    // Check for buy signal
+    if (trendReversal > ArrowPeriod)
+    {
+        buySignal = true;
+        sellSignal = false;
+    }
+    
+    // Check for sell signal
+    if (trendReversal < -ArrowPeriod)
+    {
+        sellSignal = true;
+        buySignal = false;
+    }
+    
+    // Print buy or sell signal
+    if (buySignal)
+    {
+        Print('Potential Buy Signal: ', Symbol(), ' at ', currClose);
+    }
+    else if (sellSignal)
+    {
+        Print('Potential Sell Signal: ', Symbol(), ' at ', currClose);
+    }
+    
+    // Reset signals
+    buySignal = false;
+    sellSignal = false;
+}
+
+//+------------------------------------------------------------------+
+//|                          Expert deinitialization function        |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Perform necessary cleanup tasks
+}
+
